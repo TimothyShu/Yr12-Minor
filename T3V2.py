@@ -169,6 +169,7 @@ def IterateAll():
     for Company in CurrentCompanies:
         try:
             Company.Iterate()
+            print(f"{Company.Name} has been iterated")
         except:
             print(f"The company {Company.Name} has an error")
 

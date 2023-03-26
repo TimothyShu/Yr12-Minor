@@ -1,4 +1,3 @@
-import errno, os, sys
 import openpyxl as pyxl
 from pathlib import Path
 import csv
@@ -17,8 +16,8 @@ except FileExistsError:
     pass
 
 FilePaths = open("FilePaths.csv", "r+")
-writer = csv.DictWriter(FilePaths, fieldnames = Fieldnames)
 reader = csv.DictReader(FilePaths, fieldnames = Fieldnames)
+writer = csv.DictWriter(FilePaths, fieldnames = Fieldnames)
 
 for n in reader:
     current_Dir.append(n)
@@ -86,21 +85,18 @@ def showDirectories():
 def createNewDirectory(DirLocation):
     pass
 
-def GetFile(DirName, FileName, GetPath=False):
+def getfile(DirName, FileName):
     DirPath = Path(GetDirPath(DirName))
     filepath = DirPath / FileName
     if filepath.exists():
         suffix = filepath.suffix
         match suffix:
             case ".xlsx":
-                file = pyxl.load_workbook(filepath)
+                wb = pyxl.load_workbook(filepath)
+                return wb
             case ".csv":
-                file = open(filepath, 'r+')
-            case _n:
-                file = filepath
-        if GetPath:
-            return file, filepath
-        return file
+                csvfile = open(filepath, 'r+')
+                return csvfile
     else:
         return None
     pass
