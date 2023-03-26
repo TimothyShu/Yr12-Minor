@@ -1,4 +1,3 @@
-import errno, os, sys
 import openpyxl as pyxl
 from pathlib import Path
 import csv
@@ -12,9 +11,11 @@ try:
     writer = csv.DictWriter(FilePaths, fieldnames = Fieldnames)
     writer.writeheader()
     writer.writerow({Fieldnames[0]: "Root", Fieldnames[1]: Path().absolute()})
+    FilePaths.close()
 except FileExistsError:
-    FilePaths = open("FilePaths.csv", "r+")
+    pass
 
+FilePaths = open("FilePaths.csv", "r+")
 reader = csv.DictReader(FilePaths, fieldnames = Fieldnames)
 writer = csv.DictWriter(FilePaths, fieldnames = Fieldnames)
 
