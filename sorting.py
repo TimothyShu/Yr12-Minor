@@ -11,7 +11,7 @@ def sort_insert(array, key = lambda x:x) -> None:
     for n in range(1, len(array)):
         current_position = n
         temp = array[current_position]
-        while key(temp) > key(array[current_position -1]) and current_position >=1:
+        while key(temp) < key(array[current_position -1]) and current_position >=1:
             array[current_position] = array[current_position -1]
             current_position -= 1
         array[current_position] = temp
@@ -23,7 +23,7 @@ def sorted_insert(array, key = lambda x:x) -> list:
     for n in range(1, len(new_array)):
         current_position = n
         temp = new_array[current_position]
-        while key(temp) > key(new_array[current_position -1]) and current_position >=1:
+        while key(temp) < key(new_array[current_position -1]) and current_position >=1:
             new_array[current_position] = new_array[current_position -1]
             current_position -= 1
         new_array[current_position] = temp
@@ -120,7 +120,7 @@ def swap(position1, position2, array) -> None:
     array[position2] = temp
 
 if __name__ == "__main__":
-    #print(test_data)
-    pass
+    sort_select(test_data)
+    print(test_data)
     
     
