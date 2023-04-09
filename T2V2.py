@@ -1,4 +1,6 @@
 import numpy as np
+import sorting as sort
+import math
 
 TextString = "abcdefghijklmnopqrstuvwxyz"
 
@@ -116,6 +118,7 @@ class concert:
                 self.Prefered_automatic(n_people)
                 break
             elif option == 'no':
+                self.Sequiential_Automatic(n_people)
                 break
             else:
                 print("That is not an option")
@@ -123,10 +126,10 @@ class concert:
         pass
 
     def Prefered_automatic(self, n_people) -> None:
-        seat = input("Select an empty seat")
+        seat = input("Select an empty seat\n: ")
         seat = self.Validate_Seats(seat)
         while seat == False:
-            seat = input("Select an empty seat")
+            seat = input("Select an empty seat\n: ")
             seat = self.Validate_Seats(seat)
         for seat_group in self.Seat_Groups:
             if seat_group[0] == seat[0]:
@@ -141,7 +144,6 @@ class concert:
             column = seat[1]
             start = seat_group[1]
             space_from_left = column - start
-            print(row)
             if space_from_left < n_people-1:
                 start_column = start
                 end_column = start + n_people
@@ -154,7 +156,7 @@ class concert:
             break
         else:
             print("There arn't any available consequitive seats around the seat.")
-            pass
+            self.Automatic_Fit(n_people)
         pass
 
     def Sequiential_Automatic(self, n_people) -> None:
@@ -165,10 +167,10 @@ class concert:
                 start = entry[1]
                 end = start + n_people
                 seats = self.book_Seats(row, start, end)
-                return seats
+                print(f"You have booked \n{', '.join(seats)}")
         else:
             print("There are no more available consequitive seats")
-            return None
+            self.Automatic_Fit(n_people)
     
     def Automatic_Fit(self, n_people) -> None:
         option = input("Do you want to book seats that might not be together?").lower()
@@ -185,8 +187,26 @@ class concert:
         while seat == False:
             seat = input("Select an empty seat")
             seat = self.Validate_Seats(seat)
+
+        quick_sort_key = lambda x: (abs(x[0] - seat[0]) + abs(x[1] - seat[1]) * 0.3)
         
-        list_of_seats = []
+        list_of_seats = self.AllEmptySeats[:n_people]
+        sort.sort_quick(list_of_seats, quick_sort_key)
+
+        #Loop through all empty seats
+        for seat in self.AllEmptySeats[n_people:]:
+            if quick_sort_key(seat) <= quick_sort_key(list_of_seats[3]):
+                list_of_seats.append(seat)
+                sort.sort_quick(list_of_seats, quick_sort_key)
+                list_of_seats.pop(-1)
+        
+        #This should be the top n seats
+        seats = self.book_Seats_ByList(list_of_seats)
+        print(f"You have booked \n{', '.join(seats)}")
+        
+
+            
+
 
 
     def book_People(self, n_people):
@@ -233,9 +253,10 @@ class concert:
                 print("Number?")
                 option = input("How many people are you booking for?\n: ")
                 continue
-            if self.Get_Num_EmptySeats() > n_people:
+            if self.Get_Num_EmptySeats() < n_people:
                 print(f"There arn't enough seats in the concert for {n_people} people")
                 print(f"Ther concert has {self.Get_Num_EmptySeats()} spare seats left")
+                option = input("How many people are you booking for?\n: ")
                 continue
             self.book_People(n_people)
             self.Show_concert()
@@ -246,10 +267,7 @@ class concert:
 def main():
     concert1 = concert(rows =14, column =10)
     concert1.Show_concert()
-    option = input("How many people are you booking for?\n: ")
     concert1.main()
-
-    
 
 
 if __name__ == "__main__":
