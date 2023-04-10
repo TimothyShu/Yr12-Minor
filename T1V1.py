@@ -4,7 +4,7 @@ import math
 Inputs = {
     "Play": ["p", "play", "restart", "r", "new game", "n"],
     "Set range": ["set", "new range", "change range", "switch range"],
-    "End game": ["end", "stop", "break", "end game", "stop game", "break game"]
+    "End game": ["end", "stop", "break", "end game", "stop game", "break game", "exit"]
     }
 default = [0, 100]
 
@@ -49,6 +49,9 @@ def switch(inputs):
         return "Try again"
     
 def iterategamestate(gamescore, targetnumber):
+    if gamescore == 10:
+        print("Too many guesses, try again?")
+        return False, gamescore
     loop = True
     guess = getplayerinput()
     if isinstance(guess, int):

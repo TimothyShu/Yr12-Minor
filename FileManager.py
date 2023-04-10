@@ -102,7 +102,6 @@ def GetFile(DirName, FileName, GetPath=False):
         return file
     else:
         return None
-    pass
 
 def main():
     option = input(": ")

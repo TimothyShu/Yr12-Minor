@@ -167,6 +167,9 @@ def computerguess():
     
 
 def iterategamestate(gamescore, targetnumber):
+    if gamescore == 10:
+        print("Too many guesses, try again?")
+        return False, gamescore
     loop = True
     guess = getplayerinput()
     if isinstance(guess, int):
