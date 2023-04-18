@@ -1,4 +1,5 @@
 import FileManager
+from random import randint
 import hashlib
 
 employer_fieldname = ["Name", "Address", "Work Status", "Active Positions"]
@@ -8,6 +9,7 @@ Base_Employer_ID = 000000
 Base_Employee_ID = 100000
 
 work_status_options = ["On site", "Off site", "Both"]
+TF = [True, False]
 
 class EMPLOYER:
     def __init__(self, Name, location, work_status, ID=None, Looking_For_Position=False, Email=None) -> None:
@@ -328,13 +330,36 @@ def Get_Work_Status():
 def Get_Email():
     return input("Please input your email\n: ")
 
-def Generate_Employees():
-    pass
+def Generate_Employers(num_entry):
+    letter = "abcdefghijklmnopqrstuvwxyz"
+    for n in range(0,num_entry):
 
-def Generate_Employers():
+        #Generate the name
+        name = ""
+        index = num_entry % 24
+        num_loop = int(num_entry/24)
+        for n in range(0,num_loop+1):
+            name += letter[index]
+        Name = name.upper() + " corp"
+        #Generate the address
+        address = name + " st"
+        #Generate the work status
+        work_status = work_status_options[randint(0,2)]
+        #Generate looking for position
+        looking_for_position = TF[randint(0,1)]
+        #Generate the email
+        email = name + "@gmail.com"
+
+        #Create the object
+        Employers.append(EMPLOYER(Name, address, work_status, Email=email, Looking_For_Position=looking_for_position))
+
+        #Update Employer
+        Update_Employer(None, Employers)
+        EmployerID = Employers[-1].ID
+        Update_Username_password(EmployerID, Name, "password")
+
+def Generate_Employees():
     pass
 
 Employers = Load_Employers()
 Employees = load_Employees()
-
-Create_Account()
