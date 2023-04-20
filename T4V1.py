@@ -1,15 +1,17 @@
 import FileManager
 from random import randint
-import hashlib
+from itertools import chain, product
 
 employer_fieldname = ["Name", "Address", "Work Status", "Active Positions"]
 employee_fieldname = ["Name", "Address", "Occupation"]
 
 Base_Employer_ID = 000000
 Base_Employee_ID = 100000
+letter = "abcdefghijklmnopqrstuvwxyz"
 
 work_status_options = ["On site", "Off site", "Both"]
 TF = [True, False]
+list_names = ["".join(perm) for perm in chain.from_iterable(product(letter, repeat=i) for i in range(1, 4))]
 
 class EMPLOYER:
     def __init__(self, Name, location, work_status, ID=None, Looking_For_Position=False, Email=None) -> None:
@@ -335,11 +337,7 @@ def Generate_Employers(num_entry):
     for n in range(0,num_entry):
 
         #Generate the name
-        name = ""
-        index = num_entry % 24
-        num_loop = int(num_entry/24)
-        for n in range(0,num_loop+1):
-            name += letter[index]
+        name = list_names[n]
         Name = name.upper() + " corp"
         #Generate the address
         address = name + " st"
@@ -350,16 +348,19 @@ def Generate_Employers(num_entry):
         #Generate the email
         email = name + "@gmail.com"
 
-        #Create the object
-        Employers.append(EMPLOYER(Name, address, work_status, Email=email, Looking_For_Position=looking_for_position))
-
-        #Update Employer
+        #append all of this to the excel spreadsheet
+        Employers.append(EMPLOYER(Name, address, work_status, Looking_For_Position=looking_for_position, Email=email))
         Update_Employer(None, Employers)
+
         EmployerID = Employers[-1].ID
+
         Update_Username_password(EmployerID, Name, "password")
+
 
 def Generate_Employees():
     pass
 
 Employers = Load_Employers()
 Employees = load_Employees()
+
+Generate_Employers(50)
