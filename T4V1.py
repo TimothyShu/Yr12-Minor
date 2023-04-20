@@ -10,6 +10,8 @@ Base_Employee_ID = 100000
 letter = "abcdefghijklmnopqrstuvwxyz"
 
 work_status_options = ["On site", "Off site", "Both"]
+resume = ["resume1", "resume2", None]
+resumeStatement = ["Statement1", "Statement2", None]
 TF = [True, False]
 list_names = ["".join(perm) for perm in chain.from_iterable(product(letter, repeat=i) for i in range(1, 4))]
 
@@ -57,7 +59,7 @@ class EMPLOYEE:
         if len(Employees) == 1:
             self.ID = Base_Employee_ID
             return
-        last_ID = Employees[-1][0]
+        last_ID = Employees[-2].ID
         self.ID = last_ID + 1
         self.New = False
 
@@ -332,6 +334,32 @@ def Get_Work_Status():
 def Get_Email():
     return input("Please input your email\n: ")
 
+def Generate_Employees(num_entry):
+    letter = "abcdefghijklmnopqrstuvwxyz"
+    for n in range(0,num_entry):
+
+        #Generate the name
+        name = list_names[n]
+        Name = name.upper() + " Employee"
+        #Generate the address
+        address = name + " st"
+        #Occupation
+        Occupation = Employers[randint(0,49)].Name
+        #Generate the work status
+        Employeeresume = resume[randint(0,2)]
+        #Generate looking for position
+        EmployeeStatement = resumeStatement[randint(0,2)]
+        #Generate the email
+        email = name + "@gmail.com"
+
+        #append all of this to the excel spreadsheet
+        Employees.append(EMPLOYEE(Name, address, Occupation, None, Employeeresume, EmployeeStatement, email))
+        Update_Employee(None, Employees)
+
+        EmployeeID = Employees[-1].ID
+
+        Update_Username_password(EmployeeID, Name, "password")
+
 def Generate_Employers(num_entry):
     letter = "abcdefghijklmnopqrstuvwxyz"
     for n in range(0,num_entry):
@@ -357,10 +385,5 @@ def Generate_Employers(num_entry):
         Update_Username_password(EmployerID, Name, "password")
 
 
-def Generate_Employees():
-    pass
-
 Employers = Load_Employers()
 Employees = load_Employees()
-
-Generate_Employers(50)
