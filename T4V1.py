@@ -76,7 +76,7 @@ def Load_Employers() -> list:
     cell = Employers.cell(row = 1, column = 2).value
     while cell:
         #loop through the whole row
-        column = [Employers.cell(row = row, column = ind).value for ind in range(1,6)]
+        column = [Employers.cell(row = row, column = ind).value for ind in range(1,7)]
         employers.append(column)
         row += 1
         cell = Employers.cell(row = row, column = 2).value
@@ -89,7 +89,7 @@ def Load_Employers() -> list:
     return employers
 
 def Read_Employer(Employer) -> EMPLOYER:
-    return EMPLOYER(Employer[1], Employer[2], Employer[3], Employer[0], Employer[4])
+    return EMPLOYER(Employer[1], Employer[2], Employer[3], Employer[0], Employer[4], Employer[5])
 
 def Update_Employer(ID, Employers) -> None:
     WorkBook, filepath = FileManager.GetFile("T4Dir", "Data_Store.xlsx", True)
@@ -120,7 +120,7 @@ def load_Employees() -> list:
     cell = Employees.cell(row = 1, column = 1).value
     while cell:
         #loop through the whole row
-        column = [Employees.cell(row = row, column = ind).value for ind in range(1,7)]
+        column = [Employees.cell(row = row, column = ind).value for ind in range(1,8)]
         employees.append(column)
         row += 1
         cell = Employees.cell(row = row, column = 1).value
@@ -145,7 +145,7 @@ def load_Employer(ID):
     return [ws.cell(row = row, column = ind).value for ind in range(1,7)]
 
 def Read_Employees(Employee) -> EMPLOYEE:
-    return EMPLOYEE(Employee[1], Employee[2], Employee[3], Employee[0], Employee[4], Employee[5])
+    return EMPLOYEE(Employee[1], Employee[2], Employee[3], Employee[0], Employee[4], Employee[5], Employee[6])
 
 def Update_Employee(ID,Employees) -> list:
     WorkBook, filepath = FileManager.GetFile("T4Dir", "Data_Store.xlsx", True)
@@ -218,13 +218,112 @@ def Login_Employee(userID):
     #Load their account
     print(f"You're logged into the account with ID {userID}")
     Account = load_Employee(userID)
+    print(f"Your username: {Account[1]}")
+    print(f"Your address: {Account[2]}")
+    print(f"Your Current Occupation: {Account[3]}")
+    print(f"Your Resume: {Account[4]}")
+    print(f"Your ResumeStatement: {Account[5]}")
+    print(f"Your email: {Account[6]}")
+    option = input("1. update Resume\n2. find Employers\n: ")
+    while option:
+        if option == "1":
+            UpdateResume(userID)
+        elif option == "2":
+            FindEmployers()
+        option = input("1. update Resume\n2. find Employers\n: ")
     pass
+
+
 
 def Login_Employer(userID):
     #Load their account
     print(f"You're logged into the account with ID {userID}")
     Account = load_Employer(userID)
+    print(f"Your username: {Account[1]}")
+    print(f"Your address: {Account[2]}")
+    print(f"Your work status: {Account[3]}")
+    print(f"Your looking for position: {Account[4]}")
+    print(f"Your email: {Account[5]}")
+    option = input("1. find Employees\n: ")
+    while option:
+        if option == "1":
+            FindEmployees()
+        option = input("1. find Employees\n: ")
     pass
+
+def FindEmployees():
+    for ind, Employee in enumerate(Employees):
+        print(f"{ind}. {Employee.Name}")
+    option = input("Select an Employee that you want information on\n: ")
+    while option:
+        try:
+            num = int(option)
+        except ValueError:
+            print("That is not a number")
+            continue
+        try:
+            Employee = Employees[num]
+        except IndexError:
+            print("That is not a correct number")
+            continue
+        ShowEmployee(Employee)
+        option = input("Select an Employee that you want information on\n: ")
+
+def ShowEmployee(Employee):
+    print("Details of Employee")
+    print(f"Name: {Employee.Name}")
+    print(f"Address: {Employee.Address}")
+    print(f"Occupation: {Employee.Occupation}")
+    print(f"Resume: {Employee.Resume}")
+    print(f"Resume statement: {Employee.ResumeStatement}")
+    print(f"email: {Employee.Email}")
+
+def UpdateResume(userID):
+    Employee = Get_Employee(userID)
+    resume = Get_Resume()
+    option = input("Do you want to confirm?\n: ").lower()
+    while option:
+        if option == "yes":
+            Employee.Resume = resume
+            #update the employee account
+            Update_Employee(userID, Employees)
+            print(f"Your new resume: {Employee.Resume}")
+            return
+        option = input("Do you want to confirm?\n: ").lower()
+    pass
+
+def FindEmployers():
+    for ind, Employer in enumerate(Employers):
+        print(f"{ind}. {Employer.Name}")
+    option = input("Select an employment agency by the number infront of their name\n: ")
+    while option:
+        try:
+            num = int(option)
+        except ValueError:
+            print("That is not a number")
+            continue
+        try:
+            Employer = Employers[num]
+        except IndexError:
+            print("That is not a correct number")
+            continue
+        ShowEmployer(Employer)
+        option = input("Select an employment agency by the number infront of their name\n: ")
+
+def ShowEmployer(Employer):
+    print("Details of Employer")
+    print(f"Name: {Employer.Name}")
+    print(f"address: {Employer.Address}")
+    print(f"Work Status: {Employer.Work_status}")
+    print(f"Looking for position: {Employer.Looking_For_Position}")
+    print(f"email: {Employer.Email}")
+
+def Get_Employee(ID):
+    for Employee in Employees:
+        if Employee.ID == ID:
+            return Employee
+    else:
+        return None
 
 def Check_Login_Details(username, password):
     Workbook = FileManager.GetFile("T4Dir", "Login_Details.xlsx")
@@ -387,3 +486,5 @@ def Generate_Employers(num_entry):
 
 Employers = Load_Employers()
 Employees = load_Employees()
+
+Login_Employer(20)
