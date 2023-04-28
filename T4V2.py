@@ -2,6 +2,14 @@ import FileManager
 from random import randint
 from itertools import chain, product
 
+#This is for emails
+from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
+from email.mime.application import MIMEApplication
+from email.mime.multipart import MIMEMultipart
+import os
+import smtplib
+
 employer_fieldname = ["Name", "Address", "Work Status", "Active Positions"]
 employee_fieldname = ["Name", "Address", "Occupation"]
 
@@ -224,6 +232,7 @@ def Login_Employee(userID):
     print(f"Your Resume: {Account[4]}")
     print(f"Your ResumeStatement: {Account[5]}")
     print(f"Your email: {Account[6]}")
+    Account = EMPLOYEE(Account[1], Account[2], Account[3], userID, Account[4], Account[5], Account[6])
     Filter = []
     option = input("1. update Resume\n2. find Employers\n3. add filter\n4. delete filter\n: ")
     if len(Filter) == 0:
@@ -234,7 +243,7 @@ def Login_Employee(userID):
         if option == "1":
             UpdateResume(userID)
         elif option == "2":
-            FindEmployers(Filter)
+            FindEmployers(Filter, Account)
         elif option == "3":
             Filter = Create_Employer_Filter()
         elif option == "4":
@@ -257,6 +266,7 @@ def Login_Employer(userID):
     print(f"Your work status: {Account[3]}")
     print(f"Your looking for position: {Account[4]}")
     print(f"Your email: {Account[5]}")
+    Account = EMPLOYER(Account[1], Account[2], Account[3], userID, Account[4], Account[5])
     Filters = []
     option = input("1. find Employees\n2. add filters:\n3. delete filters\n: ")
     if len(Filters) == 0:
@@ -265,7 +275,7 @@ def Login_Employer(userID):
         print(f"Filters: {', '.join([filt.Name for filt in Filters])}")
     while option:
         if option == "1":
-            FindEmployees(Filters)
+            FindEmployees(Filters, Account)
         elif option == "2":
             Filters = Create_Employee_Filter()
             pass
@@ -278,7 +288,7 @@ def Login_Employer(userID):
             print(f"Filters: {', '.join([filt.Name for filt in Filters])}")
     pass
 
-def FindEmployees(Filters):
+def FindEmployees(Filters, Employer):
     #Applying the filter
     Employee_list = Employees[:]
     for filter in Filters:
@@ -299,10 +309,10 @@ def FindEmployees(Filters):
         except IndexError:
             print("That is not a correct number")
             continue
-        ShowEmployee(Employee)
+        ShowEmployee(Employee, Employer)
         option = input("Select an Employee that you want information on\n: ")
 
-def ShowEmployee(Employee):
+def ShowEmployee(Employee, Employer):
     print("Details of Employee")
     print(f"Name: {Employee.Name}")
     print(f"Address: {Employee.Address}")
@@ -310,6 +320,12 @@ def ShowEmployee(Employee):
     print(f"Resume: {Employee.Resume}")
     print(f"Resume statement: {Employee.ResumeStatement}")
     print(f"email: {Employee.Email}")
+    option = input("Do you want to email this employee?")
+    while option:
+        if option == "y":
+            Bot.Email_Employee(employee=Employee, employer=Employer)
+            print("Email successful")
+        option = input("Do you want to email this employee?")
 
 def UpdateResume(userID):
     Employee = Get_Employee(userID)
@@ -325,7 +341,7 @@ def UpdateResume(userID):
         option = input("Do you want to confirm?\n: ").lower()
     pass
 
-def FindEmployers(Filter):
+def FindEmployers(Filter, Employee):
 
     Employer_list = Employers[:]
     for filter in Filter:
@@ -346,16 +362,22 @@ def FindEmployers(Filter):
         except IndexError:
             print("That is not a correct number")
             continue
-        ShowEmployer(Employer)
+        ShowEmployer(Employer, Employee)
         option = input("Select an employment agency by the number infront of their name\n: ")
 
-def ShowEmployer(Employer):
+def ShowEmployer(Employer, Employee):
     print("Details of Employer")
     print(f"Name: {Employer.Name}")
     print(f"address: {Employer.Address}")
     print(f"Work Status: {Employer.Work_status}")
     print(f"Looking for position: {Employer.Looking_For_Position}")
     print(f"email: {Employer.Email}")
+    option = input("Do you want to email this employer?")
+    while option:
+        if option == "y":
+            Bot.Email_Employer(Employer, Employee)
+            print("Email successful")
+        option = input("Do you want to email this employer?")
 
 def Get_Employee(ID):
     for Employee in Employees:
@@ -640,7 +662,99 @@ class Filter:
     def Show(self) -> None:
         print(self.Name)
 
+class Mailter:
+    def __init__(self) -> None:
+        self.smtp = smtplib.SMTP('smtp.gmail.com', 587)
+        self.smtp.ehlo()
+        self.smtp.starttls()
+        self.smtp.login("timbot11105@gmail.com", "geelqvzkrzactxul")
+        self.Address = "timbot11105@gmail.com"
+        pass
+
+    def sendmessage(self):
+        msg = MIMEMultipart()
+        msg["Subject"] = "Test Test test"
+        msg.attach(MIMEText(
+            """
+            Hello,
+
+            This is a test messsage
+
+            this tests the indents of the email
+
+            regards
+
+            T
+            """
+        ))
+        to = ["70928@joeys.org", "tims11105@gmail.com"]
+        self.smtp.sendmail(from_addr=self.Address,
+                           to_addrs=to,
+                           msg=msg.as_string())
+    
+    def Email_Employer(self, employer, employee):
+        destination = employer.Email
+        msg = MIMEMultipart()
+        msg["Subject"] = "A prospective new employee"
+        msg.attach(MIMEText(
+            f"""
+            Hello {employer.Name}
+
+            {employee.Name} has expressed interest in working at your company,
+            They can be contacted at {employee.Email}.
+
+            Their profile:
+            Current Occupation: {employee.Occupation}
+            Resume: {employee.Resume}
+            Statement: {employee.ResumeStatement}
+
+            Regards
+
+            This is an automated email
+            """
+        ))
+        self.smtp.sendmail(from_addr=self.Address,
+                           to_addrs=[destination],
+                           msg=msg.as_string())
+    
+    def Email_Employee(self, employer, employee):
+        destination = employee.Email
+        msg = MIMEMultipart()
+        msg["Subject"] = "An Employer has contacted you"
+        msg.attach(MIMEText(
+            f"""
+            Hello {employee.Name}
+
+            {employer.Name} has expressed interest employing you at their company,
+            They can be contacted at {employer.Email}.
+
+            Their profile:
+            Work status: {employer.Work_status}
+            Looking for Position: {employer.Looking_For_Position}
+
+            Regards
+
+            This is an automated email
+            """
+        ))
+        self.smtp.sendmail(from_addr=self.Address,
+                           to_addrs=[destination],
+                           msg=msg.as_string())
+
+    def close(self):
+        self.smtp.quit()
+
+def main():
+    option = input("1.create an account\n2. login\n: ")
+    while option:
+        if option == "1":
+            Create_Account()
+        if option == "2":
+            Login_Account()
+        option = input("1.create an account\n2. login\n: ")
+
+Bot = Mailter()
 Employers = Load_Employers()
 Employees = load_Employees()
-
-Login_Employee(100020)
+main()
+Bot.close()
