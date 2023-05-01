@@ -81,7 +81,7 @@ def sort_quick(array, key = lambda x:x) -> list:
         # then the array must all be smalled than the pivot element
         # We'll take away the pivot and then pass the rest of the array through the function
         left_side = array[:-1]
-        sort_quick(left_side)
+        sort_quick(left_side, key=key)
         array[:-1] = left_side
         array[-1] = pivot_element
         return
@@ -91,7 +91,7 @@ def sort_quick(array, key = lambda x:x) -> list:
     if large_pointer == 0:
         # then the array must all lbe bigger than the pivot element
         right_side = array[1:]
-        sort_quick(right_side)
+        sort_quick(right_side, key=key)
         array[0] = pivot_element
         array[1:] = right_side
         return
@@ -100,11 +100,11 @@ def sort_quick(array, key = lambda x:x) -> list:
 
     #left side
     left_side = array[:large_pointer]
-    sort_quick(left_side)
+    sort_quick(left_side, key=key)
 
     #right side
     right_side = array[large_pointer+1:]
-    sort_quick(right_side)
+    sort_quick(right_side,key=key)
 
     # adding the sorted left side, the middle and the sorted right side
     array[:large_pointer] = left_side
