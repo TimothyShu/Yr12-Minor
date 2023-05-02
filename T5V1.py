@@ -279,17 +279,18 @@ def search_students():
         option = input("1.show all student names, 2.inquire student\n: ")
     pass
 
-Names = create_student_name()
+if __name__ == "__main__":
+    Names = create_student_name()
 
-Students = CreateStudents(100)
+    Students = CreateStudents(100)
 
-Groups = GenerateGroups(10, Students)
+    Groups = GenerateGroups(10, Students)
 
-Cabins = CreateCabin(5, 20)
+    Cabins = CreateCabin(5, 20)
 
-print(f"unlinks: {Algorithm(Groups, Students, Cabins)}")
+    print(f"unlinks: {Algorithm(Groups, Students, Cabins)}")
 
-search_students()
+    search_students()
 
 """for n in Cabins:
     print(n.Size)
