@@ -105,7 +105,7 @@ def CreateStudents(num_students: int) -> list[Student]:
         Students.append(Student(Names[i]))
     return Students
 
-def GenerateGroups(group_num: int, students: list[Student]) -> list[Group]:
+def CreateGroups(group_num: int, students: list[Student]) -> list[Group]:
     #Fill in as many groups with minimum 2 people as possible
     len_students = len(students)
     max_num_groups = int(len_students/2)
@@ -135,7 +135,7 @@ def GenerateGroups(group_num: int, students: list[Student]) -> list[Group]:
 
     return Groups
 
-def CreateCabin(Cabin_num: int, Cabin_capactiy: int) -> list[Cabin]:
+def CreateCabins(Cabin_num: int, Cabin_capactiy: int) -> list[Cabin]:
     Cabins = []
     for index in range(0, Cabin_num):
         Cabins.append(Cabin(str(index), Cabin_capactiy))
@@ -279,14 +279,20 @@ def search_students():
         option = input("1.show all student names, 2.inquire student\n: ")
     pass
 
+def Create_env() -> list[list[Student], list[Group], list[Cabin]]:
+    Students = CreateStudents(100)
+    Groups = CreateGroups(10, Students)
+    Cabins = CreateCabins(5, 20)
+    return [Students, Groups, Cabins]
+
+Names = create_student_name()
 if __name__ == "__main__":
-    Names = create_student_name()
 
     Students = CreateStudents(100)
 
-    Groups = GenerateGroups(10, Students)
+    Groups = CreateGroups(10, Students)
 
-    Cabins = CreateCabin(5, 20)
+    Cabins = CreateCabins(5, 20)
 
     print(f"unlinks: {Algorithm(Groups, Students, Cabins)}")
 
