@@ -7,6 +7,7 @@ class Student:
         self.Name = Name
         self.Group = None
         self.Cabin = None
+        self.CabinName = None
     
     def Add_Group(self, Group)->None:
         self.Group = Group
@@ -47,6 +48,7 @@ class Cabin:
     def Add_Member(self, Student: Student) -> None:
         self.Size += 1
         self.Students.append(Student)
+        Student.Add_Cabin(self)
     
     def Remove_Member(self, Student: Student) -> None:
         for index, student in enumerate(self.Students):
@@ -144,9 +146,6 @@ def CreateCabins(Cabin_num: int, Cabin_capactiy: int) -> list[Cabin]:
 def Algorithm(Groups: list[Group], Students: list[Student], Cabins: list[Cabin]):
     #Do it randomly
 
-    #This will be our success parameter
-    unlinks = 0
-
     #Loop through each group and randomly allocate a cabin
     unalocated_Groups = []
 
@@ -240,25 +239,26 @@ def Algorithm(Groups: list[Group], Students: list[Student], Cabins: list[Cabin])
     
     #We'll just itteratively add students
     current_index = 0
-    previndex = 0
     for cabin in Cabins:
         if current_index >= len(remaining_students):
             break
-        if previndex != current_index:
-            if remaining_students[previndex].Group == remaining_students[current_index].Group:
-                unlinks += 1
-        prev_student_group = remaining_students[current_index].Group
         free_space = cabin.Capacity - cabin.Size
         while free_space > 0:
             cabin.Add_Member(remaining_students[current_index])
-            if prev_student_group != remaining_students[current_index].Group:
-                #This counts unlinks
-                unlinks += 1
-            prev_student_group = remaining_students[current_index].Group
-            previndex = current_index
             current_index += 1
             free_space -= 1
-    return unlinks
+    return
+
+def count_splits(groups: list[Group]):
+    splits = 0
+    for group in groups:
+        cabins = []
+        for student in group.Students:
+            if student.Cabin.Name not in cabins:
+                cabins.append(student.Cabin.Name)
+        group_splits = len(cabins)-1
+        splits += group_splits
+    return splits
 
 def search_students():
     option = input("1.show all student names, 2.inquire student\n: ")
@@ -294,9 +294,9 @@ if __name__ == "__main__":
 
     Cabins = CreateCabins(5, 20)
 
-    print(f"unlinks: {Algorithm(Groups, Students, Cabins)}")
-
-    search_students()
+    Algorithm(Groups, Students, Cabins)
+    print(count_splits(Groups))
+    #search_students()
 
 """for n in Cabins:
     print(n.Size)
