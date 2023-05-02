@@ -4,21 +4,36 @@ import tensorflow_probability as tfp
 from tf_agents.environments import py_environment
 from tf_agents.specs import array_spec
 from tf_agents.trajectories import time_step as ts
+import T5V1
 
 class CabinEnvironment(py_environment.PyEnvironment):
-    def __init__(self, groups, cabins, students):
+    def __init__(self):
+
+        #Create the env variables
+        variables = T5V1.Create_env()
+        students = variables[0]
+        groups = variables[1]
+        cabins = variables[2]
+
         # Define the action and observation specs
+
+        #The AI has a list of groups, it will fill up cabins consequtively with groups they choose sequentially
         self._action_spec = array_spec.BoundedArraySpec(
             shape=(), dtype=np.int32, minimum=0, maximum=len(groups) - 1, name='action')
         #This action decides which group will be added next
+
+        #This defines what the AI would be able to see.
+        #Should be able to see (what is left of) all group sizes, current cabin free space
+        # e.g. [[group0size, group1size, group2size ..., freespace]
         self._observation_spec = array_spec.BoundedArraySpec(
-            shape=(len(groups),), dtype=np.int32, minimum=0, maximum=20, name='observation')
+            shape=(len(groups)+1,), dtype=np.int32, minimum=0, maximum=20, name='observation')
 
         # Define any other necessary variables
+        self._studentts = students
         self._groups = groups
-        self.num_splits = 0
+        self._cabins = cabins
+        self._num_splits = 0
         self._num_groups = len(groups)
-        self._cabins = [[] for _ in range(self._num_groups)]
         self._episode_ended = False
 
     def action_spec(self):
@@ -28,8 +43,15 @@ class CabinEnvironment(py_environment.PyEnvironment):
         return self._observation_spec
 
     def _reset(self):
+        variables = T5V1.Create_env()
+        students = variables[0]
+        groups = variables[1]
+        cabins = variables[2]
         # Reset the environment to its initial state
-        self._cabins = [[] for _ in range(self._num_groups)]
+        self._studentts = students
+        self._groups = groups
+        self._cabins = cabins
+        self._num_splits = 0
         self._episode_ended = False
         return ts.restart(np.array([0] * self._num_groups, dtype=np.int32))
 
