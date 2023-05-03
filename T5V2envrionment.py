@@ -5,6 +5,7 @@ from tf_agents.environments import py_environment
 from tf_agents.specs import array_spec
 from tf_agents.trajectories import time_step as ts
 import T5V1
+from tf_agents.environments import tf_py_environment
 
 class CabinEnvironment(py_environment.PyEnvironment):
     def __init__(self):
@@ -26,7 +27,7 @@ class CabinEnvironment(py_environment.PyEnvironment):
         #Should be able to see (what is left of) all group sizes, current cabin free space
         # e.g. [[group0size, group1size, group2size ..., freespace]
         self._observation_spec = array_spec.BoundedArraySpec(
-            shape=(len(groups)+1,), dtype=np.int32, minimum=0, maximum=20, name='observation')
+            shape=(11,), dtype=np.int32, minimum=0, maximum=20, name='observation')
 
         # Define any other necessary variables
         self._studentts = students
@@ -53,7 +54,7 @@ class CabinEnvironment(py_environment.PyEnvironment):
         self._cabins = cabins
         self._num_splits = 0
         self._episode_ended = False
-        return ts.restart(np.array([0] * self._num_groups, dtype=np.int32))
+        return ts.restart(np.zeros(11,).astype(np.int32))
 
     def _get_obs(self, curr_cabin: T5V1.Cabin) -> np.int32:
         observ = [group.Count_unalocated() for group in self._groups]
@@ -109,3 +110,8 @@ class CabinEnvironment(py_environment.PyEnvironment):
 
 if __name__ == "__main__":
     env = CabinEnvironment()
+    train_env = tf_py_environment.TFPyEnvironment(env)
+    print(train_env.action_spec())
+    print(train_env.observation_spec())
+    print(train_env.time_step_spec())
+    print(train_env._current_time_step())
