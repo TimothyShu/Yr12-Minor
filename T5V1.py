@@ -37,6 +37,14 @@ class Group:
     
     def Show_Group(self):
         print(f"Group name: {self.Name}, size: {self.size}")
+    
+    def Count_unalocated(self) -> int:
+        Students = self.Students
+        counter = 0
+        for student in Students:
+            if student.Cabin == None:
+                counter += 1
+        return counter
 
 class Cabin:
     def __init__(self, Name: str, capacity: int) -> None:
@@ -60,9 +68,14 @@ class Cabin:
     def Add_Group(self, Group: Group) -> None:
         Students = Group.Students
         for student in Students:
-            student.Add_Cabin(self)
-            self.Add_Member(student)
-    
+            if student.Cabin != None:
+                continue
+            if self.Size < 20:
+                student.Add_Cabin(self)
+                self.Add_Member(student)
+            else:
+                break
+
     def Get_Group_Size(self) -> dict:
         current_groups = []
         Group_num = {}
@@ -145,7 +158,6 @@ def CreateCabins(Cabin_num: int, Cabin_capactiy: int) -> list[Cabin]:
 
 def Algorithm(Groups: list[Group], Students: list[Student], Cabins: list[Cabin]):
     #Do it randomly
-
     #Loop through each group and randomly allocate a cabin
     unalocated_Groups = []
 
@@ -231,6 +243,8 @@ def Algorithm(Groups: list[Group], Students: list[Student], Cabins: list[Cabin])
     #|      Part 3      |
     #|__________________|
 
+    for group in Groups:
+        print(group.Count_unalocated())
     #We will now split them up and fill in all of the remaining spots
     remaining_students = []
     for group in unalocated_Groups:
