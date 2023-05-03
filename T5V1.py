@@ -76,6 +76,9 @@ class Cabin:
             else:
                 break
 
+    def get_remaining_capacity(self) -> int:
+        return self.Capacity - self.Size
+
     def Get_Group_Size(self) -> dict:
         current_groups = []
         Group_num = {}
@@ -157,6 +160,12 @@ def CreateCabins(Cabin_num: int, Cabin_capactiy: int) -> list[Cabin]:
     return Cabins
 
 def Algorithm(Groups: list[Group], Students: list[Student], Cabins: list[Cabin]):
+
+    #This begins part 1 of the Alg
+    #___________________
+    #|                  |
+    #|      Part 1      |
+    #|__________________|
     #Do it randomly
     #Loop through each group and randomly allocate a cabin
     unalocated_Groups = []
