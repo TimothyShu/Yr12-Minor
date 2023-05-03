@@ -55,26 +55,57 @@ class CabinEnvironment(py_environment.PyEnvironment):
         self._episode_ended = False
         return ts.restart(np.array([0] * self._num_groups, dtype=np.int32))
 
+    def _get_obs(self, curr_cabin: T5V1.Cabin) -> np.int32:
+        observ = [group.Count_unalocated() for group in self._groups]
+        #Add the remaining capacity of the current cabin
+        if curr_cabin == None:
+            observ.append(0)
+        else:
+            observ.append(curr_cabin.get_remaining_capacity())
+        observation = np.array(observ, dtype=np.int32)
+        return observation
+
     def _step(self, action):
         # Take an action and return a new time step
         if self._episode_ended:
             # The last episode ended, start a new episode
             return self.reset()
 
-        # Update the cabins based on the action
-        group_size = self._groups[action]
-        for i in range(len(self._cabins)):
-            if len(self._cabins[i]) + group_size <= 20:
-                self._cabins[i].extend([action] * group_size)
+        # Select a group from 1 to len(groups)
+        Curr_group = self._groups[action]
+        
+        #Find the current Cabin
+        curr_cabin = None
+        for cabin in self._cabins:
+            if cabin.get_remaining_capacity() == 0:
+                continue
+            else:
+                curr_cabin = cabin
                 break
-
-        # Check if the episode has ended
-        if all(len(cabin) == 20 for cabin in self._cabins):
-            self._episode_ended = True
-            reward = 1.0
         else:
-            reward = 0.0
+            #If all cabins are filled, then it is ended
+
+            self._episode_ended = True
+            #Check the number of splits
+            splits = T5V1.count_splits(self._groups)
+            reward = -splits + 10
+            observation = self._get_obs(curr_cabin=curr_cabin)
+            return ts.transition(observation, reward=reward, discount=1)
+        
+        #If they picked a group that is already empty, then exit with reward -1
+        if Curr_group.Count_unalocated() == 0:
+            reward = -1
+            observation = self._get_obs(curr_cabin=curr_cabin)
+            return ts.transition(observation, reward=reward, discount=1)
+
+        #Allocate the group to the current Cabin
+        curr_cabin.Add_Group(Curr_group)
+
 
         # Return the new time step
-        observation = np.array([len(cabin) for cabin in self._cabins], dtype=np.int32)
-        return ts.transition(observation, reward=reward, discount=1.0)
+        # Remaining group size/capacity
+        observation = self._get_obs(curr_cabin=curr_cabin)
+        return ts.transition(observation, reward=0, discount=1.0)
+
+if __name__ == "__main__":
+    env = CabinEnvironment()
