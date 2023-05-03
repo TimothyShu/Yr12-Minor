@@ -243,8 +243,6 @@ def Algorithm(Groups: list[Group], Students: list[Student], Cabins: list[Cabin])
     #|      Part 3      |
     #|__________________|
 
-    for group in Groups:
-        print(group.Count_unalocated())
     #We will now split them up and fill in all of the remaining spots
     remaining_students = []
     for group in unalocated_Groups:
