@@ -1,12 +1,14 @@
 from random import randint
 from sorting import *
 from more_itertools import first_true
+import copy
 
 class Student:
     def __init__(self, Name: str) -> None:
         self.Name = Name
         self.Group = None
         self.Cabin = None
+        self.GroupName = None
         self.CabinName = None
     
     def Add_Group(self, Group)->None:
@@ -36,7 +38,8 @@ class Group:
         Student.Add_Group(self)
     
     def Show_Group(self):
-        print(f"Group name: {self.Name}, size: {self.size}")
+        print(f"Group name: {self.Name}, size: {self.Size}")
+    
     
     def Count_unalocated(self) -> int:
         Students = self.Students
@@ -104,6 +107,39 @@ class Cabin:
         for student in self.Students:
             self.Remove_Member(student)
         pass
+
+
+
+class MyEnvironment():
+    def __init__(self, Students : list[Student], Cabins : list[Cabin], Groups : list[Group]) -> None:
+        self.Students = Students
+        self.Cabins = Cabins
+        self.Groups = Groups
+    
+    def Get_Group_Size(self) -> list[int]:
+        group_sizes = []
+        for group in self.Groups:
+            size = len(group.Students)
+            group_sizes.append(size)
+        return group_sizes
+    
+    def Get_Group_by_Name(self, name: str):
+        for group in self.Groups:
+            if group.Name == name:
+                return group
+        else:
+            return None
+
+    def Copy_(self):
+        group_sizes = self.Get_Group_Size()
+        newEnv = Copy_env(group_sizes)
+        return newEnv
+
+    def reset(self):
+        for student in self.Students:
+            student.Clear_Cabin()
+        for cabin in self.Cabins:
+            cabin.Clear_Cabin()
 
 def create_student_name() -> list:
     Names = []
@@ -300,6 +336,23 @@ def search_students():
         option = input("1.show all student names, 2.inquire student\n: ")
     pass
 
+def Copy_env(group_sizes: list[int]) -> MyEnvironment:
+    #Create new students
+    Students = CreateStudents(100)
+    Groups = []
+    #loop through all the groups
+    current_student = 0
+    for ind, group_size in enumerate(group_sizes):
+        #Create new group
+        curr_group = Group(str((ind)))
+        #Allocates all students
+        for index in range(0, group_size):
+            curr_group.Add_Member(Students[current_student])
+            current_student += 1
+        Groups.append(curr_group)
+    Cabins = CreateCabins(10, 20)
+    return MyEnvironment(Students, Cabins, Groups)
+
 def Create_env() -> list[list[Student], list[Group], list[Cabin]]:
     Students = CreateStudents(100)
     Groups = CreateGroups(10, Students)
@@ -309,15 +362,20 @@ def Create_env() -> list[list[Student], list[Group], list[Cabin]]:
 Names = create_student_name()
 if __name__ == "__main__":
 
+
     Students = CreateStudents(100)
 
     Groups = CreateGroups(10, Students)
 
     Cabins = CreateCabins(5, 20)
 
-    Algorithm(Groups, Students, Cabins)
-    print(count_splits(Groups))
-    #search_students()
+    baseEnv = MyEnvironment(Students, Cabins, Groups)
+
+    group_sizes = baseEnv.Get_Group_Size()
+
+    Algorithm(baseEnv.Groups, baseEnv.Students, baseEnv.Cabins)
+
+    search_students()
 
 """for n in Cabins:
     print(n.Size)
