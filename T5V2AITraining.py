@@ -22,10 +22,6 @@ log_interval = 200
 train_py_env = CabinEnvironment()
 eval_py_env = CabinEnvironment()
 train_env = tf_py_environment.TFPyEnvironment(train_py_env)
-print(train_env.action_spec())
-print(train_env.observation_spec())
-print(train_env.time_step_spec())
-print(train_env._current_time_step())
 eval_env = tf_py_environment.TFPyEnvironment(eval_py_env)
 
 # Create the agent
@@ -73,13 +69,17 @@ optimizer = tf.compat.v1.train.AdamOptimizer(learning_rate=learning_rate)
 
 
 # Define the training loop
-def train_agent(num_iterations, eval_interval):
+def train_agent(num_iterations, eval_interval, iterator):
     for i in range(num_iterations):
         # Collect data
         collect_data(train_env, agent.policy, replay_buffer, collect_steps_per_iteration)
 
         # Sample a batch of data from the buffer
-        experience, unused_info = next(iterator)
+        try:
+            experience, unused_info = next(iterator)
+        except tf.errors.OutOfRangeError:
+            iterator = iter(dataset)
+            experience, unused_info = next(iterator)
 
         # Train the agent
         train_loss = common.function(agent.train)(experience)
@@ -90,6 +90,8 @@ def train_agent(num_iterations, eval_interval):
         if i % eval_interval == 0:
             avg_return = compute_avg_return(eval_env, agent.policy, num_episodes=10)
             print('Iteration {}: loss = {}, average return = {}'.format(i, train_loss, avg_return))
+
+
 
 # Define a function to evaluate the agent
 def compute_avg_return(environment, policy, num_episodes=10):
@@ -105,6 +107,6 @@ def compute_avg_return(environment, policy, num_episodes=10):
     avg_return = total_return / num_episodes
     return avg_return.numpy()[0]
 
-train_agent(num_iterations=num_iterations, eval_interval=100)
+train_agent(num_iterations=num_iterations, eval_interval=100, iterator=iterator)
 
 compute_avg_return(environment=eval_env, policy=agent.policy, num_episodes=10)
