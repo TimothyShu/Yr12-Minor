@@ -71,7 +71,7 @@ class Cabin:
     def Add_Group(self, Group: Group) -> None:
         Students = Group.Students
         for student in Students:
-            if student.Cabin != None:
+            if student.CabinName != None:
                 continue
             if self.Size < 20:
                 student.Add_Cabin(self)
@@ -106,6 +106,8 @@ class Cabin:
     def Clear_Cabin(self) -> None:
         for student in self.Students:
             self.Remove_Member(student)
+        self.Students = []
+        self.Size = 0
         pass
 
 
@@ -311,13 +313,13 @@ def count_splits(groups: list[Group]):
     for group in groups:
         cabins = []
         for student in group.Students:
-            if student.Cabin.Name not in cabins:
-                cabins.append(student.Cabin.Name)
+            if student.CabinName not in cabins:
+                cabins.append(student.CabinName)
         group_splits = len(cabins)-1
         splits += group_splits
     return splits
 
-def search_students():
+def search_students(Students):
     option = input("1.show all student names, 2.inquire student\n: ")
     while option:
         if option == "1":
@@ -350,7 +352,7 @@ def Copy_env(group_sizes: list[int]) -> MyEnvironment:
             curr_group.Add_Member(Students[current_student])
             current_student += 1
         Groups.append(curr_group)
-    Cabins = CreateCabins(10, 20)
+    Cabins = CreateCabins(5, 20)
     return MyEnvironment(Students, Cabins, Groups)
 
 def Create_env() -> list[list[Student], list[Group], list[Cabin]]:
@@ -375,7 +377,9 @@ if __name__ == "__main__":
 
     Algorithm(baseEnv.Groups, baseEnv.Students, baseEnv.Cabins)
 
-    search_students()
+    print(count_splits(Groups))
+
+    search_students(Students)
 
 """for n in Cabins:
     print(n.Size)
