@@ -120,7 +120,8 @@ def swap(position1, position2, array) -> None:
     array[position2] = temp
 
 if __name__ == "__main__":
-    sort_select(test_data)
+    test_data = [3,1,2,3]
+    sort_quick(test_data)
     print(test_data)
     
     
