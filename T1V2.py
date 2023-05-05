@@ -106,7 +106,7 @@ def Playcomp():
     targetnumber = generatenumber()
     compsolved = False
     playersolved = False
-    playersocre = 0
+    playerscore = 0
     compguess = computerguess()
     playerguess = getplayerinput()
     if playerguess in Inputs["End game"]:
@@ -114,6 +114,7 @@ def Playcomp():
     while compsolved != True and playersolved != True:
         compsolved, compHigher = HigherLower(compguess, targetnumber, 0, Player=False)
         playersolved, playerHigher = HigherLower(playerguess, targetnumber, playerscore)
+        playerscore += 1
         if playersolved and compsolved == False:
             print("You beat the computer!")
             break
