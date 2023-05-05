@@ -123,7 +123,7 @@ class employee:
 
 
 
-
-
 if __name__ == "__main__":
     Joeys = Company("Joeys", "JoeysStaff.xlsx")
+    Joeys.readEmployees()
+    Joeys.updateEmployeeOvertime()
