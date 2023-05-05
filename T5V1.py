@@ -365,17 +365,13 @@ Names = create_student_name()
 if __name__ == "__main__":
 
 
-    Students = CreateStudents(100)
+    Students = CreateStudents(200)
 
-    Groups = CreateGroups(10, Students)
+    Groups = CreateGroups(30, Students)
 
-    Cabins = CreateCabins(5, 20)
+    Cabins = CreateCabins(10, 20)
 
-    baseEnv = MyEnvironment(Students, Cabins, Groups)
-
-    group_sizes = baseEnv.Get_Group_Size()
-
-    Algorithm(baseEnv.Groups, baseEnv.Students, baseEnv.Cabins)
+    Algorithm(Groups, Students, Cabins)
 
     print(count_splits(Groups))
 
